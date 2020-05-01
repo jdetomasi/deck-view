@@ -1,0 +1,1 @@
+export const SCRYFALL_COLLECTION_URL = 'https://api.scryfall.com/cards/collection'
