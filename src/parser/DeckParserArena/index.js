@@ -1,14 +1,14 @@
 const CRLF = '\n';
-const COMMANDER = 'COMMANDER';
-const COMPANION = 'COMPANION';
-const DECK = 'DECK';
+const COMMANDER = /^(COMMANDER|COMANDANTE)/;
+const COMPANION = /^(COMPANION|COMPAÑERO)/;
+const DECK = /^(DECK|MAZO)/;
 const SIDEBOARD = 'SIDEBOARD';
 const REGEX = /^([0-9]+)\s([^(]*)\s\((.*)\)\s([0-9]+)/;
 
 const getLinesSanitized = (text) => {
     let lines = text.split(CRLF);
     return lines.map(l => l.trim().toUpperCase());
-}
+};
 
 const parseLine = (line) => {
     let parsed = line.match(REGEX);
@@ -18,28 +18,29 @@ const parseLine = (line) => {
         set: parsed[3],
         collector_number: parsed[4],
     }
-}
+};
 
 const getCommander = (text) => {
     let lines = getLinesSanitized(text);
-    let index = lines.indexOf(COMMANDER);
+    let index = lines.findIndex(line => COMMANDER.test(line));
     if (index >= 0) {
         return parseLine(lines[index + 1]);
     }
-}
+};
 
 const getCompanion = (text) => {
     let lines = getLinesSanitized(text);
-    let index = lines.indexOf(COMPANION);
+    let index = lines.findIndex(line => COMPANION.test(line));
     if (index >= 0) {
         return parseLine(lines[index + 1]);
     }
-}
+};
 
 const getMainDeck = (text) => {
     let lines = getLinesSanitized(text);
     let deck = [];
-    for (let i = lines.indexOf(DECK) + 1; i < lines.length; i++) {
+    let index = lines.findIndex(line => DECK.test(line));
+    for (let i = index + 1; i < lines.length; i++) {
         let line = lines[i];
         if (0 !== line.length) {
             deck.push(parseLine(line));
@@ -48,7 +49,7 @@ const getMainDeck = (text) => {
         }
     }
     return deck;
-}
+};
 
 const getSideboard = (text) => {
     let lines = getLinesSanitized(text);
@@ -62,7 +63,7 @@ const getSideboard = (text) => {
         }
     }
     return sd;
-}
+};
 
 const parseDeck = (text) => {
     return {
@@ -71,6 +72,6 @@ const parseDeck = (text) => {
         deck: getMainDeck(text),
         sideboard: getSideboard(text)
     }
-}
+};
 
 export default {parseDeck}
